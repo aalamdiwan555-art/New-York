@@ -8,6 +8,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.serializer.KotlinXSerializer
 import kotlinx.serialization.json.Json
 
 object SupabaseClientProvider {
@@ -23,6 +24,7 @@ object SupabaseClientProvider {
             supabaseUrl = BuildConfig.SUPABASE_URL,
             supabaseKey = BuildConfig.SUPABASE_ANON_KEY
         ) {
+            defaultSerializer = KotlinXSerializer(jsonConfig)
             install(Auth) {
                 // Session auto-refresh is enabled by default
             }

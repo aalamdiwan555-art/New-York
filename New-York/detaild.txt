@@ -1,0 +1,100 @@
+RIDE PRICE MATCHER — TECHNICAL DOCUMENTATION
+=============================================
+
+1. PROJECT OVERVIEW
+-------------------
+Ride Price Matcher is an Android application that observes visible text on
+supported ride-hailing applications, extracts price information, matches it
+against user-configured rules, and notifies the user via an overlay.
+
+CRITICAL CONSTRAINT: The application NEVER automatically accepts rides or
+injects clicks into third-party applications. The flow is:
+  DETECT -> MATCH -> SHOW OVERLAY -> USER CONFIRMS -> USER MANUALLY ACCEPTS
+
+2. TECHNOLOGY STACK
+-------------------
+- Language: Kotlin
+- UI: Jetpack Compose (Material3)
+- Min SDK: 26 (Android 8.0)
+- Target SDK: 34
+- Architecture: MVVM + Repository pattern
+- Backend: Supabase (Auth, PostgREST, Realtime)
+- Local DB: Room
+- DI: Manual service locator (Application class)
+- Ads: Unity Ads SDK
+- Optional: OpenCV (interface-isolated)
+
+3. MODULE BREAKDOWN
+-------------------
+
+3.1 Domain Layer
+  - PriceParser: Recognizes ₹250, Rs 250, INR 250, 250 रुपये, etc.
+  - TextNormalizer: Unicode NFC, punctuation normalization, OCR noise handling
+  - AcceptancePhraseMatcher: Exact, contains, word-boundary, fuzzy (Levenshtein)
+  - MatchingEngine: Full pipeline from raw text to MatchResult
+
+3.2 Data Layer
+  - SupabaseClientProvider: Uses publishable anon key ONLY
+  - AppDatabase: Room with 5 entities, TypeConverters for JSON lists/maps
+  - Repositories: Auth, Entitlement, Language, UserPreference, Admin
+
+3.3 UI Layer
+  - Auth: Login, Signup, ForgotPassword screens
+  - Onboarding: 9-page horizontal pager
+  - Home: Dashboard with entitlement, ad progress, monitoring status
+  - Settings: Price rule configuration
+  - Subscription: Rewarded ad progress and watch button
+  - Admin: User search, block/unblock, grant ad-free/lifetime
+
+3.4 Service Layer
+  - RideAccessibilityService: Observes text from allowlisted packages only
+  - OverlayService: Floating match notification window
+  - ScreenCaptureService: MediaProjection with user consent
+  - BootReceiver: Restores state after reboot
+
+4. SECURITY MEASURES
+--------------------
+- Supabase secret key is NEVER in the APK
+- Admin authorization uses server-side RLS + role checks
+- Entitlements are server-authoritative with local cache fallback
+- Ad rewards are recorded server-side with provider reward ID
+- No raw backend errors exposed to users
+- No passwords, tokens, or screen contents logged
+
+5. SUBSCRIPTION MODEL
+---------------------
+- FREE: Basic functionality
+- AD_REWARDED: 20 valid rewarded ads = 1 day premium
+- PREMIUM: Time-based subscription
+- AD_FREE: No advertisements
+- LIFETIME: Permanent access
+- BLOCKED: All protected features disabled
+
+6. INITIAL LANGUAGES
+--------------------
+English, Hindi, Kannada, Telugu, Tamil, Bengali, Marathi, Malayalam
+
+7. BUILD INSTRUCTIONS
+---------------------
+1. Add SUPABASE_ANON_KEY to local.properties or CI secrets
+2. Run: ./gradlew assembleDebug
+3. APK output: app/build/outputs/apk/debug/app-debug.apk
+
+8. CI/CD
+--------
+GitHub Actions workflow:
+  checkout -> setup JDK -> unit tests -> lint -> assembleDebug -> upload artifacts
+
+9. KNOWN LIMITATIONS
+--------------------
+- Unity Ads integration requires proper initialization in production
+- Screen capture is a placeholder architecture (Surface not fully implemented)
+- OpenCV integration is interface-defined but pipeline is stubbed
+- Some Supabase serialization may need adjustment for exact DTO mapping
+- Gradle wrapper JAR is not included (must be generated via `gradle wrapper`)
+
+10. TESTING STATUS
+------------------
+- Unit tests: PriceParser, AcceptancePhraseMatcher, MatchingEngine, TextNormalizer
+- Instrumentation tests: Auth navigation flow
+- Full device testing not yet performed

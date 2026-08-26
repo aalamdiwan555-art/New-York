@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Ride Price Matcher</string>
+    <string name="accessibility_service_label">Ride Price Matcher Text Observer</string>
+    <string name="accessibility_service_description">This service observes visible text on supported ride applications to detect prices and acceptance buttons based on your configured rules. No automatic actions are performed.</string>
+</resources>

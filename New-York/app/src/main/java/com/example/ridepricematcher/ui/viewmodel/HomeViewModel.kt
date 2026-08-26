@@ -39,6 +39,12 @@ class HomeViewModel : ViewModel() {
 
     init {
         loadHomeData()
+        // FIX #1: Start language collection here, not inside loadHomeData
+        viewModelScope.launch {
+            langRepo.getEnabledLanguages().collect { list ->
+                _languages.value = list
+            }
+        }
     }
 
     fun loadHomeData() {
@@ -49,29 +55,22 @@ class HomeViewModel : ViewModel() {
                 return@launch
             }
 
-            // Load profile
+            // FIX #2: Handle refresh error
             authRepo.refreshSession()
+                .onFailure { _error.value = it as? AppError }
 
-            // Load entitlement (server-authoritative)
             entitlementRepo.getEntitlement(userId)
                 .onSuccess { _entitlement.value = it }
                 .onFailure { _error.value = it as? AppError }
 
-            // Load preferences
             prefRepo.getPreferences(userId)
                 .onSuccess { _preferences.value = it }
 
-            // Load ad progress
             entitlementRepo.getAdRewardCount(userId)
                 .onSuccess { _adProgress.value = it % 20 }
 
-            // Sync languages
+            // FIX #3: Just sync, don't collect here
             langRepo.syncLanguages()
-                .onSuccess {
-                    langRepo.getEnabledLanguages().collect { list ->
-                        _languages.value = list
-                    }
-                }
 
             _isLoading.value = false
         }

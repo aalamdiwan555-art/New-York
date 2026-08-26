@@ -5,6 +5,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val supabaseAnonKey = project.findProperty("SUPABASE_ANON_KEY")?.toString().orEmpty()
+
 android {
     namespace = "com.example.ridepricematcher"
     compileSdk = 34
@@ -22,7 +24,7 @@ android {
         }
 
         buildConfigField("String", "SUPABASE_URL", "\"https://rhwpbnzbevufolojjimh.supabase.co\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"\" + (project.findProperty(\"SUPABASE_ANON_KEY\") ?: \"\") + \"\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
         buildConfigField("String", "UNITY_GAME_ID", "\"6178983\"")
     }
 
@@ -38,6 +40,14 @@ android {
         debug {
             isDebuggable = true
             applicationIdSuffix = ".debug"
+        }
+    }
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a", "x86_64")
+            isUniversalApk = false
         }
     }
     compileOptions {

@@ -2,7 +2,7 @@ package com.example.ridepricematcher.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ridepricematcher.RidePriceMatcherApplication
+import com.example.ridepricematcher.AppModule
 import com.example.ridepricematcher.domain.model.AppError
 import com.example.ridepricematcher.domain.model.AuditLog
 import com.example.ridepricematcher.domain.model.UserProfile
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class AdminViewModel : ViewModel() {
 
-    private val adminRepo = RidePriceMatcherApplication.instance.adminRepository
+    private val adminRepo = AppModule.adminRepository
     private val authRepo = RidePriceMatcherApplication.instance.authRepository
 
     private val _users = MutableStateFlow<List<UserProfile>>(emptyList())

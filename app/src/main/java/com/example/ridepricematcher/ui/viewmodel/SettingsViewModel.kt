@@ -2,7 +2,7 @@ package com.example.ridepricematcher.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ridepricematcher.RidePriceMatcherApplication
+import com.example.ridepricematcher.AppModule
 import com.example.ridepricematcher.domain.model.AppError
 import com.example.ridepricematcher.domain.model.PriceRule
 import com.example.ridepricematcher.domain.model.UserPreferences
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel : ViewModel() {
 
-    private val prefRepo = RidePriceMatcherApplication.instance.userPreferenceRepository
+    private val prefRepo = AppModule.userPreferenceRepository
     private val authRepo = RidePriceMatcherApplication.instance.authRepository
 
     private val _preferences = MutableStateFlow<UserPreferences?>(null)

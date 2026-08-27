@@ -31,7 +31,9 @@ class AdminRepository {
             ) {
                 filter { eq("id", userId) }
             }
-            logAction(adminId, "block_user", userId)
+            logAction(adminId, "block_user", userId).getOrElse { error ->
+                return@withContext Result.failure(error)
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(AppError.Server("Failed to block user", e.message ?: ""))
@@ -45,7 +47,9 @@ class AdminRepository {
             ) {
                 filter { eq("id", userId) }
             }
-            logAction(adminId, "unblock_user", userId)
+            logAction(adminId, "unblock_user", userId).getOrElse { error ->
+                return@withContext Result.failure(error)
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(AppError.Server("Failed to unblock user", e.message ?: ""))
@@ -60,7 +64,9 @@ class AdminRepository {
                     put("ad_free", true)
                 }
             )
-            logAction(adminId, "grant_ad_free", userId)
+            logAction(adminId, "grant_ad_free", userId).getOrElse { error ->
+                return@withContext Result.failure(error)
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(AppError.Server("Failed to grant ad-free", e.message ?: ""))
@@ -74,7 +80,9 @@ class AdminRepository {
             ) {
                 filter { eq("user_id", userId) }
             }
-            logAction(adminId, "revoke_ad_free", userId)
+            logAction(adminId, "revoke_ad_free", userId).getOrElse { error ->
+                return@withContext Result.failure(error)
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(AppError.Server("Failed to revoke ad-free", e.message ?: ""))
@@ -90,7 +98,9 @@ class AdminRepository {
                     put("type", "LIFETIME")
                 }
             )
-            logAction(adminId, "grant_lifetime", userId)
+            logAction(adminId, "grant_lifetime", userId).getOrElse { error ->
+                return@withContext Result.failure(error)
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(AppError.Server("Failed to grant lifetime", e.message ?: ""))
@@ -108,8 +118,8 @@ class AdminRepository {
         }
     }
 
-    private suspend fun logAction(adminId: String, action: String, targetId: String? = null) {
-        try {
+    private suspend fun logAction(adminId: String, action: String, targetId: String? = null): Result<Unit> {
+        return try {
             postgrest.from("audit_logs").insert(
                 buildJsonObject {
                     put("admin_user_id", adminId)
@@ -117,8 +127,9 @@ class AdminRepository {
                     targetId?.let { put("target_user_id", it) }
                 }
             )
-        } catch (_: Exception) {
-            // Silent fail for audit logging
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(AppError.Server("Failed to write audit log", e.message ?: ""))
         }
     }
 

@@ -2,6 +2,8 @@ package com.example.ridepricematcher.data.remote
 
 import com.example.ridepricematcher.BuildConfig
 import io.github.jan.supabase.SupabaseClient
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpTimeout
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
@@ -32,6 +34,17 @@ object SupabaseClientProvider {
                 defaultSchema = "public"
             }
             install(Realtime)
+            httpConfig {
+                install(HttpTimeout) {
+                    requestTimeoutMillis = 30_000
+                    connectTimeoutMillis = 15_000
+                    socketTimeoutMillis = 15_000
+                }
+                install(HttpRequestRetry) {
+                    retryOnServerErrors(maxRetries = 3)
+                    exponentialDelay()
+                }
+            }
         }
     }
 

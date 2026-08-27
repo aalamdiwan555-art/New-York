@@ -35,7 +35,7 @@ class SubscriptionViewModel : ViewModel() {
             entitlementRepo.getEntitlement(userId)
                 .onSuccess {
                     _entitlement.value = it
-                    AdPolicy.updateEntitlement(RidePriceMatcherApplication.instance, it)
+                    AdPolicy.updateEntitlement(AppModule.applicationContext, it)
                 }
             entitlementRepo.getAdRewardCount(userId)
                 .onSuccess { _adProgress.value = it % 20 }

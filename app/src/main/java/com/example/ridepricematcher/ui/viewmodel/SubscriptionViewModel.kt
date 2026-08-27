@@ -2,7 +2,7 @@ package com.example.ridepricematcher.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ridepricematcher.RidePriceMatcherApplication
+import com.example.ridepricematcher.AppModule
 import com.example.ridepricematcher.ads.AdPolicy
 import com.example.ridepricematcher.domain.model.AppError
 import com.example.ridepricematcher.domain.model.Entitlement
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class SubscriptionViewModel : ViewModel() {
 
-    private val authRepo = RidePriceMatcherApplication.instance.authRepository
+    private val authRepo = AppModule.authRepository
     private val entitlementRepo = RidePriceMatcherApplication.instance.entitlementRepository
 
     private val _entitlement = MutableStateFlow<Entitlement?>(null)

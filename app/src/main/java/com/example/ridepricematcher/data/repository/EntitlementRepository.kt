@@ -72,16 +72,12 @@ class EntitlementRepository(
     }
 
     private suspend fun fetchRemoteEntitlement(userId: String): Entitlement? {
-        return try {
-            val result = postgrest.from("entitlements")
-                .select {
-                    filter { eq("user_id", userId) }
-                }
-                .decodeSingleOrNull<EntitlementDto>()
-            result?.toDomain()
-        } catch (_: Exception) {
-            null
-        }
+        val result = postgrest.from("entitlements")
+            .select {
+                filter { eq("user_id", userId) }
+            }
+            .decodeSingleOrNull<EntitlementDto>()
+        return result?.toDomain()
     }
 
     private suspend fun cacheEntitlement(entitlement: Entitlement) {

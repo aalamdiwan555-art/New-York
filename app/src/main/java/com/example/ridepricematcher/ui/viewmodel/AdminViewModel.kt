@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 class AdminViewModel : ViewModel() {
 
     private val adminRepo = AppModule.adminRepository
-    private val authRepo = RidePriceMatcherApplication.instance.authRepository
+    private val authRepo = AppModule.authRepository
 
     private val _users = MutableStateFlow<List<UserProfile>>(emptyList())
     val users: StateFlow<List<UserProfile>> = _users.asStateFlow()

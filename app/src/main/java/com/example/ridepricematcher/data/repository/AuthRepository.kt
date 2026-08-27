@@ -115,8 +115,12 @@ class AuthRepository {
                     put("blocked", false)
                 }
             )
-        } catch (_: Exception) {
-            // Profile may already exist
+        } catch (e: Exception) {
+            val message = e.message.orEmpty()
+            val isDuplicate = message.contains("duplicate", ignoreCase = true) ||
+                message.contains("already exists", ignoreCase = true) ||
+                message.contains("23505")
+            if (!isDuplicate) throw e
         }
     }
 

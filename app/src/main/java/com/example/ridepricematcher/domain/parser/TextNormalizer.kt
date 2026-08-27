@@ -12,8 +12,8 @@ class TextNormalizer {
     }
 
     private fun String.normalizeUnicode(): String {
-        // Normalize to NFC form
-        return java.text.Normalizer.normalize(this, java.text.Normalizer.Form.NFC)
+        // NFKC folds compatibility characters commonly produced by OCR.
+        return java.text.Normalizer.normalize(this, java.text.Normalizer.Form.NFKC)
     }
 
     private fun String.normalizePunctuation(): String {

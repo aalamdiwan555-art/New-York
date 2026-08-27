@@ -8,7 +8,7 @@ class PriceParser {
     companion object {
         // Currency patterns for Indian context - raw strings avoid escape issues
         private val CURRENCY_PATTERNS = listOf(
-            Pattern.compile("""(?i)\b(?:Rs\.?|INR|₹|रु\.?)\s*([0-9,]+(?:\.[0-9]+)?)"""),
+            Pattern.compile("""(?i)(?:\b(?:Rs\.?|INR|रु\.?)|₹)\s*([0-9,]+(?:\.[0-9]+)?)"""),
             Pattern.compile("""(?i)\b([0-9,]+(?:\.[0-9]+)?)\s*(?:Rs\.?|INR|₹|रु\.?|रुपये)"""),
             Pattern.compile("""(?i)\b(?:price|fare|cost|amount)\s*[:=]?\s*([0-9,]+(?:\.[0-9]+)?)"""),
             Pattern.compile("""(?i)\b([0-9,]+(?:\.[0-9]+)?)\s*(?:रुपये|रु\.?)"""),

@@ -68,7 +68,7 @@ class HomeViewModel : ViewModel() {
                 .onSuccess {
                     _entitlement.value = it
                     _profile.value?.let { profile ->
-                        AdPolicy.setUser(RidePriceMatcherApplication.instance, profile, it)
+                        AdPolicy.setUser(AppModule.applicationContext, profile, it)
                     }
                 }
                 .onFailure { _error.value = it as? AppError }

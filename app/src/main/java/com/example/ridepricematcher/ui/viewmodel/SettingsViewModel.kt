@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 class SettingsViewModel : ViewModel() {
 
     private val prefRepo = AppModule.userPreferenceRepository
-    private val authRepo = RidePriceMatcherApplication.instance.authRepository
+    private val authRepo = AppModule.authRepository
 
     private val _preferences = MutableStateFlow<UserPreferences?>(null)
     val preferences: StateFlow<UserPreferences?> = _preferences.asStateFlow()

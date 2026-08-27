@@ -1,5 +1,6 @@
 package com.example.ridepricematcher.ui.screens.home
 
+import android.app.Activity
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
@@ -18,17 +19,19 @@ import com.example.ridepricematcher.ads.UnityAdsManager
 
 @Composable
 fun UnityBannerAd(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
+    val activity = LocalContext.current as? Activity
     var initialized by remember { mutableStateOf(false) }
     var banner by remember { mutableStateOf<BannerView?>(null) }
 
-    LaunchedEffect(Unit) {
-        UnityAdsManager.initialize(context) { initialized = true }
+    LaunchedEffect(activity) {
+        if (activity != null) {
+            UnityAdsManager.initialize(activity) { initialized = true }
+        }
     }
 
-    DisposableEffect(initialized) {
-        if (!initialized) return@DisposableEffect onDispose { }
-        val view = UnityAdsManager.createBanner(context)
+    DisposableEffect(activity, initialized) {
+        if (activity == null || !initialized) return@DisposableEffect onDispose { }
+        val view = UnityAdsManager.createBanner(activity)
         banner = view
         onDispose {
             view?.destroy()

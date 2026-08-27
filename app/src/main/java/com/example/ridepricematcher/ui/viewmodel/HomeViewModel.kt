@@ -13,9 +13,9 @@ import kotlinx.coroutines.launch
 class HomeViewModel : ViewModel() {
 
     private val authRepo = AppModule.authRepository
-    private val entitlementRepo = RidePriceMatcherApplication.instance.entitlementRepository
-    private val prefRepo = RidePriceMatcherApplication.instance.userPreferenceRepository
-    private val langRepo = RidePriceMatcherApplication.instance.languageRepository
+    private val entitlementRepo = AppModule.entitlementRepository
+    private val prefRepo = AppModule.userPreferenceRepository
+    private val langRepo = AppModule.languageRepository
 
     private val _profile = MutableStateFlow<UserProfile?>(null)
     val profile: StateFlow<UserProfile?> = _profile.asStateFlow()

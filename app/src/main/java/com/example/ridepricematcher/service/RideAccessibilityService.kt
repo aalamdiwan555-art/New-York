@@ -3,6 +3,7 @@ package com.example.ridepricematcher.service
 import android.accessibilityservice.AccessibilityService
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import com.example.ridepricematcher.RidePriceMatcherApplication
 import com.example.ridepricematcher.domain.matcher.MatchingEngine
 import com.example.ridepricematcher.domain.model.*
 import kotlinx.coroutines.*
@@ -81,10 +82,27 @@ class RideAccessibilityService : AccessibilityService() {
     }
 
     private suspend fun processText(text: String, sourcePackage: String) {
-        // Load user preferences and languages from local cache
-        // In production: inject via service locator or DI
-        val rule = PriceRule(minimumFare = 100.0, maximumFare = 500.0, currency = "INR")
-        val languages = getDefaultLanguages()
+        val application = applicationContext as RidePriceMatcherApplication
+        val userId = application.authRepository.currentUserId() ?: return
+        val preferences = application.userPreferenceRepository
+            .getPreferences(userId)
+            .getOrNull()
+            ?: return
+
+        if (!preferences.matchingEnabled) return
+
+        val rule = PriceRule(
+            minimumFare = preferences.minimumPrice,
+            maximumFare = preferences.maximumPrice,
+            currency = "INR"
+        )
+        if (!rule.isValid()) return
+
+        val languages = getDefaultLanguages().filter {
+            preferences.selectedLanguages.isEmpty() ||
+                it.locale in preferences.selectedLanguages
+        }
+        if (languages.isEmpty()) return
 
         val result = matchingEngine.process(text, rule, languages)
         if (result is MatchResult.Success) {

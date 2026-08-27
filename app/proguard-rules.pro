@@ -14,3 +14,10 @@
 
 # Keep Compose
 -keep class androidx.compose.** { *; }
+
+# Kotlin serialization generated serializers
+-keepclassmembers class **$$serializer { *; }
+-keepclassmembers class com.example.ridepricematcher.domain.model.** {
+    *** Companion;
+    kotlinx.serialization.KSerializer serializer(...);
+}

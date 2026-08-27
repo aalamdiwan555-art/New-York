@@ -135,6 +135,7 @@ object UnityAdsManager {
     }
 
     fun createBanner(activity: Activity): BannerView? {
+        if (!AdPolicy.shouldShowAds(activity)) return null
         if (!initialized && !UnityAds.isInitialized) return null
         return BannerView(activity, BANNER_PLACEMENT, UnityBannerSize(320, 50)).also { it.load() }
     }
@@ -177,6 +178,11 @@ object UnityAdsManager {
         onRewarded: () -> Unit,
         onError: (String) -> Unit
     ) {
+        if (!AdPolicy.shouldShowAds(activity)) {
+            onError("Ads are not available for this account")
+            return
+        }
+
         if (!rewardedLoaded) {
             onError("Ad not loaded yet")
             loadRewardedAd(onError = onError)

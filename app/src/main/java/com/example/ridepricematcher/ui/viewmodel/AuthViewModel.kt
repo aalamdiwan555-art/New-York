@@ -2,7 +2,7 @@ package com.example.ridepricematcher.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ridepricematcher.RidePriceMatcherApplication
+import com.example.ridepricematcher.AppModule
 import com.example.ridepricematcher.domain.model.AppError
 import com.example.ridepricematcher.domain.model.UserProfile
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
 
-    private val authRepo = RidePriceMatcherApplication.instance.authRepository
+    private val authRepo = AppModule.authRepository
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()

@@ -134,9 +134,9 @@ object UnityAdsManager {
         })
     }
 
-    fun createBanner(context: Context): BannerView? {
+    fun createBanner(activity: Activity): BannerView? {
         if (!initialized && !UnityAds.isInitialized) return null
-        return BannerView(context, BANNER_PLACEMENT, UnityBannerSize(320, 50)).also { it.load() }
+        return BannerView(activity, BANNER_PLACEMENT, UnityBannerSize(320, 50)).also { it.load() }
     }
 
     fun showInterstitialIfAllowed(activity: Activity): Boolean {

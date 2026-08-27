@@ -50,7 +50,9 @@ class AuthRepository {
                     ?: return@withContext Result.failure(
                         AppError.Auth("Login failed", "Invalid credentials")
                     )
-                val profile = fetchProfile(user.id)
+                val profile = fetchProfile(user.id).getOrElse { error ->
+                    return@withContext Result.failure(error)
+                }
                 if (profile?.blocked == true) {
                     auth.signOut()
                     return@withContext Result.failure(AppError.Blocked())
@@ -90,7 +92,9 @@ class AuthRepository {
     suspend fun getCurrentProfile(): Result<UserProfile> = withContext(Dispatchers.IO) {
         val user = auth.currentUserOrNull()
             ?: return@withContext Result.failure(AppError.Auth("Not signed in", "No active session"))
-        val profile = fetchProfile(user.id) ?: mapToProfile(user, "")
+        val profile = fetchProfile(user.id).getOrElse { error ->
+            return@withContext Result.failure(error)
+        } ?: mapToProfile(user, "")
         AdPolicy.setUser(RidePriceMatcherApplication.instance, profile)
         Result.success(profile)
     }
@@ -124,16 +128,18 @@ class AuthRepository {
         }
     }
 
-    private suspend fun fetchProfile(userId: String): UserProfile? {
+    private suspend fun fetchProfile(userId: String): Result<UserProfile?> {
         return try {
             val result = postgrest.from("profiles")
                 .select(columns = Columns.list("id", "email", "display_name", "role", "blocked", "created_at", "updated_at")) {
                     filter { eq("id", userId) }
                 }
                 .decodeSingleOrNull<UserProfileDto>()
-            result?.toDomain()
-        } catch (_: Exception) {
-            null
+            Result.success(result?.toDomain())
+        } catch (e: Exception) {
+            Result.failure(
+                AppError.Server("Unable to load your profile. Please try again.", e.message ?: "Profile lookup failed")
+            )
         }
     }
 

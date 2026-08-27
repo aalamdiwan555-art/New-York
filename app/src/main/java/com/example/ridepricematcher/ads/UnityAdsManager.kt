@@ -7,22 +7,18 @@ import com.unity3d.ads.IUnityAdsInitializationListener
 import com.unity3d.ads.IUnityAdsLoadListener
 import com.unity3d.ads.IUnityAdsShowListener
 import com.unity3d.ads.UnityAds
+import com.unity3d.ads.UnityAdsShowOptions
 
-/**
- * Small lifecycle-safe wrapper around Unity's rewarded placement.
- *
- * Rewards are granted by SubscriptionViewModel only after Unity reports a
- * completed show, never when the user merely taps the button.
- */
 object UnityAdsManager {
     const val REWARDED_PLACEMENT = "rewardedVideo"
 
     private var initialized = false
     private var loading = false
     private var loadAfterInitialization = false
+    private var isAdLoaded = false
 
     fun initialize(context: Context) {
-        if (initialized || UnityAds.isInitialized()) return
+        if (initialized || UnityAds.isInitialized) return
 
         UnityAds.initialize(
             context.applicationContext,
@@ -36,7 +32,6 @@ object UnityAdsManager {
                         loadRewardedAd()
                     }
                 }
-
                 override fun onInitializationFailed(
                     error: UnityAds.UnityAdsInitializationError,
                     message: String
@@ -52,30 +47,33 @@ object UnityAdsManager {
         onLoaded: () -> Unit = {},
         onError: (String) -> Unit = {}
     ) {
-        if (!initialized && !UnityAds.isInitialized()) {
+        // v4 me isInitialized property hai, function nahi
+        if (!initialized && !UnityAds.isInitialized) {
             loadAfterInitialization = true
             return
         }
 
-        if (UnityAds.isReady(REWARDED_PLACEMENT)) {
+        if (isAdLoaded) {
             onLoaded()
             return
         }
 
         if (loading) return
         loading = true
+        
         UnityAds.load(REWARDED_PLACEMENT, object : IUnityAdsLoadListener {
             override fun onUnityAdsAdLoaded(placementId: String) {
                 loading = false
+                isAdLoaded = true
                 onLoaded()
             }
-
             override fun onUnityAdsFailedToLoad(
                 placementId: String,
                 error: UnityAds.UnityAdsLoadError,
                 message: String
             ) {
                 loading = false
+                isAdLoaded = false
                 onError(message)
             }
         })
@@ -86,25 +84,26 @@ object UnityAdsManager {
         onRewarded: () -> Unit,
         onError: (String) -> Unit
     ) {
-        if (!UnityAds.isReady(REWARDED_PLACEMENT)) {
+        if (!isAdLoaded) {
+            onError("Ad not loaded yet")
             loadRewardedAd(onError = onError)
             return
         }
 
-        UnityAds.show(activity, REWARDED_PLACEMENT, object : IUnityAdsShowListener {
+        UnityAds.show(activity, REWARDED_PLACEMENT, UnityAdsShowOptions(), object : IUnityAdsShowListener {
             override fun onUnityAdsShowFailure(
                 placementId: String,
                 error: UnityAds.UnityAdsShowError,
                 message: String
             ) {
+                isAdLoaded = false
                 onError(message)
                 loadRewardedAd()
             }
-
-            override fun onUnityAdsShowStart(placementId: String) = Unit
-
+            override fun onUnityAdsShowStart(placementId: String) {
+                isAdLoaded = false
+            }
             override fun onUnityAdsShowClick(placementId: String) = Unit
-
             override fun onUnityAdsShowComplete(
                 placementId: String,
                 state: UnityAds.UnityAdsShowCompletionState

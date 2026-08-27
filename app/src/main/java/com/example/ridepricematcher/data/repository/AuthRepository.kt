@@ -58,7 +58,7 @@ class AuthRepository {
                     return@withContext Result.failure(AppError.Blocked())
                 }
                 val effectiveProfile = profile ?: mapToProfile(user, "")
-                AdPolicy.setUser(RidePriceMatcherApplication.instance, effectiveProfile)
+                AdPolicy.setUser(AppModule.applicationContext, effectiveProfile)
                 Result.success(effectiveProfile)
             } catch (e: Exception) {
                 Result.failure(mapAuthError(e))
@@ -78,7 +78,7 @@ class AuthRepository {
     suspend fun signOut(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             auth.signOut()
-            AdPolicy.clear(RidePriceMatcherApplication.instance)
+            AdPolicy.clear(AppModule.applicationContext)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(AppError.Auth("Logout failed", e.message ?: "Unknown error"))
@@ -95,7 +95,7 @@ class AuthRepository {
         val profile = fetchProfile(user.id).getOrElse { error ->
             return@withContext Result.failure(error)
         } ?: mapToProfile(user, "")
-        AdPolicy.setUser(RidePriceMatcherApplication.instance, profile)
+        AdPolicy.setUser(AppModule.applicationContext, profile)
         Result.success(profile)
     }
 

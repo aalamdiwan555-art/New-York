@@ -103,27 +103,58 @@ class PriceParser {
     }
 
     private fun findPriceNearKeywords(text: String): PriceResult? {
+        var bestResult: PriceResult? = null
+        var bestConfidence = 0f
+
         for (keyword in PRICE_KEYWORDS) {
-            val index = text.indexOf(keyword, ignoreCase = true)
-            if (index >= 0) {
+            var index = text.indexOf(keyword, ignoreCase = true)
+            while (index >= 0) {
                 val windowStart = (index - 30).coerceAtLeast(0)
                 val windowEnd = (index + keyword.length + 30).coerceAtMost(text.length)
                 val window = text.substring(windowStart, windowEnd)
-
                 val matcher = NUMBER_PATTERN.matcher(window)
-                if (matcher.find()) {
+
+                while (matcher.find()) {
                     val rawAmount = matcher.group(1)?.replace(",", "") ?: continue
                     val amount = rawAmount.toDoubleOrNull() ?: continue
-                    return PriceResult(
-                        amount = amount,
-                        currency = "INR",
-                        confidence = 0.4f,
-                        sourceText = matcher.group()
-                    )
+                    val numberStart = windowStart + matcher.start()
+                    val numberEnd = windowStart + matcher.end()
+                    val before = text.substring((numberStart - 20).coerceAtLeast(0), numberStart)
+                    val after = text.substring(numberEnd, (numberEnd + 20).coerceAtMost(text.length))
+
+                    val belongsToMetric =
+                        Regex("(?i)(?:km|kms|kilometers?|miles?|min|mins|minutes?)\\s*$").containsMatchIn(before) ||
+                            Regex("(?i)^\\s*(?:km|kms|kilometers?|miles?|min|mins|minutes?)\\b").containsMatchIn(after) ||
+                            Regex("(?i)(?:trip\\s*id|rating|surge|multiplier)\\s*$").containsMatchIn(before)
+                    if (belongsToMetric) continue
+
+                    val distance = if (numberStart >= index + keyword.length) {
+                        numberStart - (index + keyword.length)
+                    } else {
+                        index - numberEnd
+                    }.coerceAtLeast(0)
+                    var confidence = 0.4f
+                    if (amount in 10.0..50000.0) confidence += 0.15f
+                    if (numberStart >= index + keyword.length) confidence += 0.1f
+                    if (distance <= 12) confidence += 0.1f
+                    confidence -= (distance / 60f).coerceAtMost(0.2f)
+                    confidence = confidence.coerceIn(0f, 1f)
+
+                    if (confidence > bestConfidence) {
+                        bestConfidence = confidence
+                        bestResult = PriceResult(
+                            amount = amount,
+                            currency = "INR",
+                            confidence = confidence,
+                            sourceText = matcher.group()
+                        )
+                    }
                 }
+                index = text.indexOf(keyword, index + keyword.length, ignoreCase = true)
             }
         }
-        return null
+
+        return bestResult
     }
 
     fun parseMultiple(text: String): List<PriceResult> {

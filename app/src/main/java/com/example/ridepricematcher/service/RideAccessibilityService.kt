@@ -3,7 +3,7 @@ package com.example.ridepricematcher.service
 import android.accessibilityservice.AccessibilityService
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import com.example.ridepricematcher.RidePriceMatcherApplication
+import com.example.ridepricematcher.AppModule
 import com.example.ridepricematcher.domain.matcher.MatchingEngine
 import com.example.ridepricematcher.domain.model.*
 import kotlinx.coroutines.*
@@ -83,9 +83,8 @@ class RideAccessibilityService : AccessibilityService() {
     }
 
     private suspend fun processText(text: String, sourcePackage: String) {
-        val application = applicationContext as RidePriceMatcherApplication
-        val userId = application.authRepository.currentUserId() ?: return
-        val preferences = application.userPreferenceRepository
+        val userId = AppModule.authRepository.currentUserId() ?: return
+        val preferences = AppModule.userPreferenceRepository
             .getPreferences(userId)
             .getOrNull()
             ?: return

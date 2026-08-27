@@ -89,7 +89,7 @@ fun OnboardingScreen(
 @Composable
 fun OnboardingPage(page: Int) {
     val pages = listOf(
-        Pair("Welcome to Ride Price Matcher", "Find the best ride fares automatically across supported apps."),
+        Pair("Welcome to Autopilot", "Find the best ride fares automatically across supported apps."),
         Pair("How It Works", "Set your price rules, and we'll watch for matching ride offers in real-time."),
         Pair("Supported Languages", "English, Hindi, Kannada, Telugu, Tamil, Bengali, Marathi, Malayalam, and more."),
         Pair("Price Settings", "Configure minimum, maximum, or exact fare targets that matter to you."),

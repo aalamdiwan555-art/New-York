@@ -1,5 +1,6 @@
 package com.example.ridepricematcher.ui.screens.subscription
 
+import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -7,8 +8,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.ridepricematcher.ads.UnityAdsManager
 import com.example.ridepricematcher.domain.model.EntitlementType
 import com.example.ridepricematcher.ui.viewmodel.SubscriptionViewModel
 
@@ -21,9 +24,20 @@ fun SubscriptionScreen(
     val entitlement by viewModel.entitlement.collectAsStateWithLifecycle()
     val adProgress by viewModel.adProgress.collectAsStateWithLifecycle()
     val adState by viewModel.adState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var isShowingAd by remember { mutableStateOf(false) }
+    var adMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        UnityAdsManager.initialize(context)
+        UnityAdsManager.loadRewardedAd(
+            onError = { adMessage = "Ad is still loading. Please try again in a moment." }
+        )
+    }
 
     LaunchedEffect(adState) {
         if (adState is SubscriptionViewModel.AdState.Rewarded) {
+            isShowingAd = false
             kotlinx.coroutines.delay(2000)
             viewModel.resetAdState()
         }
@@ -86,21 +100,52 @@ fun SubscriptionScreen(
                 }
             }
 
-            // Watch Ad Button
             Button(
                 onClick = {
-                    viewModel.onAdRewarded("unity", "demo_reward_id_${System.currentTimeMillis()}")
+                    val activity = context as? Activity
+                    if (activity == null) {
+                        adMessage = "This screen cannot show an ad right now."
+                        return@Button
+                    }
+                    adMessage = null
+                    isShowingAd = true
+                    UnityAdsManager.showRewardedAd(
+                        activity = activity,
+                        onRewarded = {
+                            isShowingAd = false
+                            viewModel.onAdRewarded(
+                                provider = "unity",
+                                rewardId = "unity_${System.currentTimeMillis()}"
+                            )
+                        },
+                        onError = {
+                            isShowingAd = false
+                            adMessage = "Ad unavailable right now. Please try again."
+                        }
+                    )
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = adState !is SubscriptionViewModel.AdState.Processing
+                enabled = !isShowingAd && adState !is SubscriptionViewModel.AdState.Processing
             ) {
-                when (adState) {
-                    is SubscriptionViewModel.AdState.Processing ->
+                when {
+                    isShowingAd -> CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp
+                    )
+                    adState is SubscriptionViewModel.AdState.Processing ->
                         CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                    is SubscriptionViewModel.AdState.Rewarded ->
+                    adState is SubscriptionViewModel.AdState.Rewarded ->
                         Text("Rewarded! +1")
-                    else -> Text("Watch Rewarded Ad")
+                    else -> Text("Watch an ad to earn access")
                 }
+            }
+
+            adMessage?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
 
             if (adState is SubscriptionViewModel.AdState.Error) {

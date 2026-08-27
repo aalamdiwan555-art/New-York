@@ -1,4 +1,4 @@
-# Ride Price Matcher
+# Autopilot
 
 An Android application that helps users identify ride offers whose visible price matches user-defined price rules. Built with Kotlin, Jetpack Compose, and Supabase.
 

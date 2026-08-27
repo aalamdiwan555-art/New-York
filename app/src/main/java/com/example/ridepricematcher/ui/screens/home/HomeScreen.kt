@@ -1,7 +1,9 @@
 package com.example.ridepricematcher.ui.screens.home
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ridepricematcher.domain.model.EntitlementType
@@ -35,9 +40,15 @@ fun HomeScreen(
     val languages by viewModel.languages.collectAsStateWithLifecycle()
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Ride Price Matcher") },
+                title = {
+                    Text(
+                        text = "Autopilot",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 actions = {
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(Icons.Default.Settings, contentDescription = "Settings")
@@ -56,36 +67,43 @@ fun HomeScreen(
                 CircularProgressIndicator()
             }
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 12 })
             ) {
-                item {
-                    WelcomeCard(name = profile?.displayName ?: "Rider")
-                }
-                item {
-                    EntitlementCard(entitlement = entitlement)
-                }
-                item {
-                    AdProgressCard(progress = adProgress, onClick = onNavigateToSubscription)
-                }
-                item {
-                    MonitoringStatusCard(
-                        enabled = preferences?.matchingEnabled ?: false,
-                        languages = languages.filter { it.locale in (preferences?.selectedLanguages ?: emptyList()) },
-                        minPrice = preferences?.minimumPrice,
-                        maxPrice = preferences?.maximumPrice
-                    )
-                }
-                item {
-                    QuickActionsCard(
-                        onSettings = onNavigateToSettings,
-                        onSubscription = onNavigateToSubscription,
-                        onLogout = onLogout
-                    )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    item {
+                        WelcomeCard(name = profile?.displayName ?: "Rider")
+                    }
+                    item {
+                        MonitoringStatusCard(
+                            enabled = preferences?.matchingEnabled ?: false,
+                            languages = languages.filter {
+                                it.locale in (preferences?.selectedLanguages ?: emptyList())
+                            },
+                            minPrice = preferences?.minimumPrice,
+                            maxPrice = preferences?.maximumPrice
+                        )
+                    }
+                    item {
+                        EntitlementCard(entitlement = entitlement)
+                    }
+                    item {
+                        AdProgressCard(progress = adProgress, onClick = onNavigateToSubscription)
+                    }
+                    item {
+                        QuickActionsCard(
+                            onSettings = onNavigateToSettings,
+                            onSubscription = onNavigateToSubscription,
+                            onLogout = onLogout
+                        )
+                    }
                 }
             }
         }
@@ -97,18 +115,28 @@ fun WelcomeCard(name: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
+        Column(
+            modifier = Modifier
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.secondary
+                        )
+                    ),
+                    RoundedCornerShape(16.dp)
+                )
+                .padding(20.dp)
+        ) {
+            Text("Welcome back", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.78f))
+            Text(name, style = MaterialTheme.typography.headlineMedium, color = Color.White)
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Welcome back,",
+                "Your ride matches, at a glance.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-            )
-            Text(
-                text = name,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = Color.White.copy(alpha = 0.86f)
             )
         }
     }
@@ -160,6 +188,10 @@ fun EntitlementCard(entitlement: com.example.ridepricematcher.domain.model.Entit
 
 @Composable
 fun AdProgressCard(progress: Int, onClick: () -> Unit) {
+    val animatedProgress by animateFloatAsState(
+        targetValue = (progress / 20f).coerceIn(0f, 1f),
+        label = "reward progress"
+    )
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -173,7 +205,7 @@ fun AdProgressCard(progress: Int, onClick: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(12.dp))
             LinearProgressIndicator(
-                progress = { progress / 20f },
+                progress = { animatedProgress },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp)

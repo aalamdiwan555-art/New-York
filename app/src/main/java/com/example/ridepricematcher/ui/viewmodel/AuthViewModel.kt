@@ -83,11 +83,14 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun logout() {
+    fun logout(onComplete: () -> Unit = {}) {
         viewModelScope.launch {
+            // Clear local auth state even if the network is unavailable. This
+            // prevents a stale screen from looking like the user is still in.
             authRepo.signOut()
             _currentUser.value = null
             _uiState.value = AuthUiState.Idle
+            onComplete()
         }
     }
 

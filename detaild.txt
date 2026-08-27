@@ -1,9 +1,9 @@
-RIDE PRICE MATCHER — TECHNICAL DOCUMENTATION
+AUTOPILOT — TECHNICAL DOCUMENTATION
 =============================================
 
 1. PROJECT OVERVIEW
 -------------------
-Ride Price Matcher is an Android application that observes visible text on
+Autopilot is an Android application that observes visible text on
 supported ride-hailing applications, extracts price information, matches it
 against user-configured rules, and notifies the user via an overlay.
 

@@ -58,7 +58,7 @@ class OverlayService : Service() {
             manager.createNotificationChannel(channel)
         }
         return Notification.Builder(this, channelId)
-            .setContentTitle("Ride Price Matcher")
+            .setContentTitle("Autopilot")
             .setContentText("Monitoring for price matches")
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .build()

@@ -2,6 +2,7 @@ package com.example.ridepricematcher
 
 import android.app.Application
 import androidx.room.Room
+import com.example.ridepricematcher.ads.UnityAdsManager
 import com.example.ridepricematcher.data.local.AppDatabase
 import com.example.ridepricematcher.data.repository.*
 
@@ -32,7 +33,7 @@ class RidePriceMatcherApplication : Application() {
         database = Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java,
-            "ride_price_matcher.db"
+            "autopilot.db"
         ).build()
 
         authRepository = AuthRepository()
@@ -40,6 +41,7 @@ class RidePriceMatcherApplication : Application() {
         languageRepository = LanguageRepository(database.languageDao(), database.phraseDao())
         userPreferenceRepository = UserPreferenceRepository(database.userPreferenceDao())
         adminRepository = AdminRepository()
+        UnityAdsManager.initialize(this)
     }
 
     companion object {

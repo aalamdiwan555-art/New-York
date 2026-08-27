@@ -32,7 +32,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.ridepricematcher"
+        applicationId = "com.autopilot.driver"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -76,7 +76,6 @@ android {
 
         debug {
             isDebuggable = true
-            applicationIdSuffix = ".debug"
         }
     }
 

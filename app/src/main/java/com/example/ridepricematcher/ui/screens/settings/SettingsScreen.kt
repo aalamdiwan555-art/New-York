@@ -70,19 +70,6 @@ fun SettingsScreen(
                 prefix = { Text("₹") }
             )
 
-            OutlinedTextField(
-                value = priceRule.exactFare?.toString() ?: "",
-                onValueChange = {
-                    viewModel.updatePriceRule(
-                        priceRule.copy(exactFare = it.toDoubleOrNull())
-                    )
-                },
-                label = { Text("Exact Fare (optional)") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                prefix = { Text("₹") }
-            )
-
             Divider(modifier = Modifier.padding(vertical = 8.dp))
 
             Row(

@@ -15,7 +15,7 @@ class AuthNavigationTest {
 
     @Test
     fun loginScreen_isDisplayed() {
-        composeTestRule.onNodeWithText("Ride Price Matcher").assertExists()
+        composeTestRule.onNodeWithText("Autopilot").assertExists()
         composeTestRule.onNodeWithText("Email").assertExists()
         composeTestRule.onNodeWithText("Password").assertExists()
     }

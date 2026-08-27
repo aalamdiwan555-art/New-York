@@ -59,7 +59,7 @@ class ScreenCaptureService : Service() {
             manager.createNotificationChannel(channel)
         }
         return Notification.Builder(this, channelId)
-            .setContentTitle("Ride Price Matcher")
+            .setContentTitle("Autopilot")
             .setContentText("Screen capture active")
             .setSmallIcon(android.R.drawable.ic_menu_camera)
             .build()

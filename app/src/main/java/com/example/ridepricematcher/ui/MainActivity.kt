@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ridepricematcher.ui.screens.admin.AdminScreen
 import com.example.ridepricematcher.ui.screens.auth.ForgotPasswordScreen
 import com.example.ridepricematcher.ui.screens.auth.LoginScreen
@@ -22,6 +23,7 @@ import com.example.ridepricematcher.ui.screens.onboarding.OnboardingScreen
 import com.example.ridepricematcher.ui.screens.settings.SettingsScreen
 import com.example.ridepricematcher.ui.screens.subscription.SubscriptionScreen
 import com.example.ridepricematcher.ui.theme.RidePriceMatcherTheme
+import com.example.ridepricematcher.ui.viewmodel.AuthViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +41,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val authViewModel: AuthViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -48,6 +51,7 @@ fun AppNavigation() {
     ) {
         composable("login") {
             LoginScreen(
+                viewModel = authViewModel,
                 onNavigateToSignup = { navController.navigate("signup") },
                 onNavigateToForgot = { navController.navigate("forgot") },
                 onLoginSuccess = {
@@ -85,8 +89,10 @@ fun AppNavigation() {
                 onNavigateToSubscription = { navController.navigate("subscription") },
                 onNavigateToAdmin = { navController.navigate("admin") },
                 onLogout = {
-                    navController.navigate("login") {
-                        popUpTo("home") { inclusive = true }
+                    authViewModel.logout {
+                        navController.navigate("login") {
+                            popUpTo(navController.graph.id) { inclusive = true }
+                        }
                     }
                 }
             )

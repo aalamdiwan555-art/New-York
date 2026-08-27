@@ -50,7 +50,6 @@ injects clicks into third-party applications. The flow is:
   - RideAccessibilityService: Observes text from allowlisted packages only
   - OverlayService: Floating match notification window
   - ScreenCaptureService: MediaProjection with user consent
-  - BootReceiver: Restores state after reboot
 
 4. SECURITY MEASURES
 --------------------

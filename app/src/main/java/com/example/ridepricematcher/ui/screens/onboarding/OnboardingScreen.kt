@@ -25,7 +25,7 @@ fun OnboardingScreen(
     onComplete: () -> Unit
 ) {
     val completed by viewModel.completed.collectAsStateWithLifecycle()
-    val pagerState = rememberPagerState(pageCount = { 9 })
+    val pagerState = rememberPagerState(pageCount = { 8 })
 
     LaunchedEffect(completed) {
         if (completed) onComplete()
@@ -53,13 +53,13 @@ fun OnboardingScreen(
         ) {
             TextButton(
                 onClick = { viewModel.skipToEnd() },
-                enabled = pagerState.currentPage < 8
+                enabled = pagerState.currentPage < 7
             ) {
                 Text("Skip")
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                repeat(9) { index ->
+                repeat(8) { index ->
                     val selected = pagerState.currentPage == index
                     Box(
                         modifier = Modifier
@@ -80,7 +80,7 @@ fun OnboardingScreen(
             }
 
             Button(onClick = { viewModel.nextPage() }) {
-                Text(if (pagerState.currentPage == 8) "Get Started" else "Next")
+                Text(if (pagerState.currentPage == 7) "Get Started" else "Next")
             }
         }
     }
@@ -95,7 +95,6 @@ fun OnboardingPage(page: Int) {
         Pair("Price Settings", "Configure minimum, maximum, or exact fare targets that matter to you."),
         Pair("Overlay", "A floating window shows match status without leaving your ride app."),
         Pair("Accessibility", "We use Accessibility Service to read visible text — you control everything."),
-        Pair("Screen Capture", "Optional screen capture for advanced detection. Fully user-consented."),
         Pair("Privacy First", "We process text locally. No screenshots uploaded. You remain in control."),
         Pair("Ready!", "Set your rules and start matching. You always confirm the final action."),
     )
@@ -116,8 +115,7 @@ fun OnboardingPage(page: Int) {
             3 -> Icons.Default.AttachMoney
             4 -> Icons.Default.PictureInPicture
             5 -> Icons.Default.Accessibility
-            6 -> Icons.Default.Screenshot
-            7 -> Icons.Default.Security
+            6 -> Icons.Default.Security
             else -> Icons.Default.CheckCircle
         }
         Icon(

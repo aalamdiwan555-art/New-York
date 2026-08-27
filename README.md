@@ -8,7 +8,7 @@ An Android application that helps users identify ride offers whose visible price
 - **ViewModel Layer**: StateFlow-based MVVM
 - **Domain Layer**: Price parsing, text normalization, acceptance phrase matching
 - **Data Layer**: Supabase remote + Room local cache
-- **Services**: AccessibilityService (text observation), OverlayService (match notifications), ScreenCaptureService (optional)
+- **Services**: AccessibilityService (text observation), OverlayService (match notifications)
 
 ## Setup
 

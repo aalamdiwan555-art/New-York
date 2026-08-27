@@ -1,6 +1,8 @@
 package com.example.ridepricematcher.data.repository
 
 import com.example.ridepricematcher.data.remote.SupabaseClientProvider
+import com.example.ridepricematcher.ads.AdPolicy
+import com.example.ridepricematcher.RidePriceMatcherApplication
 import com.example.ridepricematcher.domain.model.AppError
 import com.example.ridepricematcher.domain.model.UserProfile
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -53,7 +55,9 @@ class AuthRepository {
                     auth.signOut()
                     return@withContext Result.failure(AppError.Blocked())
                 }
-                Result.success(profile ?: mapToProfile(user, ""))
+                val effectiveProfile = profile ?: mapToProfile(user, "")
+                AdPolicy.setUser(RidePriceMatcherApplication.instance, effectiveProfile)
+                Result.success(effectiveProfile)
             } catch (e: Exception) {
                 Result.failure(mapAuthError(e))
             }
@@ -72,6 +76,7 @@ class AuthRepository {
     suspend fun signOut(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             auth.signOut()
+            AdPolicy.clear(RidePriceMatcherApplication.instance)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(AppError.Auth("Logout failed", e.message ?: "Unknown error"))
@@ -81,6 +86,14 @@ class AuthRepository {
     fun isAuthenticated(): Boolean = auth.currentUserOrNull() != null
 
     fun currentUserId(): String? = auth.currentUserOrNull()?.id
+
+    suspend fun getCurrentProfile(): Result<UserProfile> = withContext(Dispatchers.IO) {
+        val user = auth.currentUserOrNull()
+            ?: return@withContext Result.failure(AppError.Auth("Not signed in", "No active session"))
+        val profile = fetchProfile(user.id) ?: mapToProfile(user, "")
+        AdPolicy.setUser(RidePriceMatcherApplication.instance, profile)
+        Result.success(profile)
+    }
 
     suspend fun refreshSession(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
@@ -98,7 +111,7 @@ class AuthRepository {
                     put("id", userId)
                     put("email", email)
                     put("display_name", name)
-                    put("role", "user")
+                    put("role", if (email.equals(AdPolicy.PRIMARY_ADMIN_EMAIL, ignoreCase = true)) "admin" else "user")
                     put("blocked", false)
                 }
             )

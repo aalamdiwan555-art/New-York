@@ -19,6 +19,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import android.app.Activity
+import androidx.compose.ui.platform.LocalContext
+import com.example.ridepricematcher.ads.AdPolicy
+import com.example.ridepricematcher.ads.UnityAdsManager
 import com.example.ridepricematcher.domain.model.EntitlementType
 import com.example.ridepricematcher.domain.model.LanguageConfig
 import com.example.ridepricematcher.ui.viewmodel.HomeViewModel
@@ -38,6 +42,13 @@ fun HomeScreen(
     val adProgress by viewModel.adProgress.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val languages by viewModel.languages.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(profile?.id, entitlement) {
+        if (entitlement != null && AdPolicy.shouldShowAds(profile, entitlement)) {
+            (context as? Activity)?.let { UnityAdsManager.showInterstitialIfAllowed(it) }
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -96,6 +107,11 @@ fun HomeScreen(
                     }
                     item {
                         AdProgressCard(progress = adProgress, onClick = onNavigateToSubscription)
+                    }
+                    if (entitlement != null && AdPolicy.shouldShowAds(profile, entitlement)) {
+                        item {
+                            UnityBannerAd(modifier = Modifier.fillMaxWidth())
+                        }
                     }
                     item {
                         QuickActionsCard(

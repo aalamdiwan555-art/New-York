@@ -3,6 +3,7 @@ package com.example.ridepricematcher.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ridepricematcher.RidePriceMatcherApplication
+import com.example.ridepricematcher.ads.AdPolicy
 import com.example.ridepricematcher.domain.model.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,12 +56,21 @@ class HomeViewModel : ViewModel() {
                 return@launch
             }
 
+            authRepo.getCurrentProfile()
+                .onSuccess { _profile.value = it }
+                .onFailure { _error.value = it as? AppError }
+
             // FIX #2: Handle refresh error
             authRepo.refreshSession()
                 .onFailure { _error.value = it as? AppError }
 
             entitlementRepo.getEntitlement(userId)
-                .onSuccess { _entitlement.value = it }
+                .onSuccess {
+                    _entitlement.value = it
+                    _profile.value?.let { profile ->
+                        AdPolicy.setUser(RidePriceMatcherApplication.instance, profile, it)
+                    }
+                }
                 .onFailure { _error.value = it as? AppError }
 
             prefRepo.getPreferences(userId)

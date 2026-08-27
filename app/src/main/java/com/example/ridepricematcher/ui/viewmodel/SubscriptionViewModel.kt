@@ -3,6 +3,7 @@ package com.example.ridepricematcher.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ridepricematcher.RidePriceMatcherApplication
+import com.example.ridepricematcher.ads.AdPolicy
 import com.example.ridepricematcher.domain.model.AppError
 import com.example.ridepricematcher.domain.model.Entitlement
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +33,10 @@ class SubscriptionViewModel : ViewModel() {
         viewModelScope.launch {
             val userId = authRepo.currentUserId() ?: return@launch
             entitlementRepo.getEntitlement(userId)
-                .onSuccess { _entitlement.value = it }
+                .onSuccess {
+                    _entitlement.value = it
+                    AdPolicy.updateEntitlement(RidePriceMatcherApplication.instance, it)
+                }
             entitlementRepo.getAdRewardCount(userId)
                 .onSuccess { _adProgress.value = it % 20 }
         }

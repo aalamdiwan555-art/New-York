@@ -13,6 +13,9 @@ import android.view.Gravity
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import com.example.ridepricematcher.domain.model.MatchResult
+import com.example.ridepricematcher.ads.AdPolicy
+import com.example.ridepricematcher.ads.UnityAdsManager
+import com.unity3d.services.banners.BannerView
 
 /**
  * Overlay service that displays match notifications.
@@ -23,6 +26,7 @@ class OverlayService : Service() {
 
     private var windowManager: WindowManager? = null
     private var overlayView: android.view.View? = null
+    private var bannerView: BannerView? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -102,6 +106,13 @@ class OverlayService : Service() {
                 text = "Dismiss"
                 setOnClickListener { removeOverlay() }
             })
+
+            if (AdPolicy.shouldShowAds(this@OverlayService)) {
+                UnityAdsManager.createBanner(this@OverlayService)?.let { adView ->
+                    bannerView = adView
+                    addView(adView)
+                }
+            }
         }
 
         overlayView = view
@@ -109,6 +120,8 @@ class OverlayService : Service() {
     }
 
     private fun removeOverlay() {
+        bannerView?.destroy()
+        bannerView = null
         overlayView?.let {
             try { windowManager?.removeView(it) } catch (_: Exception) {}
             overlayView = null

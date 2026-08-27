@@ -1,6 +1,7 @@
 package com.example.ridepricematcher.ui
 
 import android.os.Bundle
+import com.example.ridepricematcher.ads.UnityAdsManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.*
@@ -35,6 +36,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        UnityAdsManager.showInterstitialIfAllowed(this)
     }
 }
 

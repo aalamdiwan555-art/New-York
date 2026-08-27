@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.ridepricematcher.ads.AdPolicy
 import com.example.ridepricematcher.ads.UnityAdsManager
 import com.example.ridepricematcher.domain.model.EntitlementType
 import com.example.ridepricematcher.ui.viewmodel.SubscriptionViewModel
@@ -27,12 +28,15 @@ fun SubscriptionScreen(
     val context = LocalContext.current
     var isShowingAd by remember { mutableStateOf(false) }
     var adMessage by remember { mutableStateOf<String?>(null) }
+    val adsAllowed = entitlement != null && AdPolicy.shouldShowAds(context)
 
-    LaunchedEffect(Unit) {
-        UnityAdsManager.initialize(context)
-        UnityAdsManager.loadRewardedAd(
-            onError = { adMessage = "Ad is still loading. Please try again in a moment." }
-        )
+    LaunchedEffect(adsAllowed) {
+        if (adsAllowed) {
+            UnityAdsManager.initialize(context)
+            UnityAdsManager.loadRewardedAd(
+                onError = { adMessage = "Ad is still loading. Please try again in a moment." }
+            )
+        }
     }
 
     LaunchedEffect(adState) {
@@ -81,7 +85,7 @@ fun SubscriptionScreen(
             }
 
             // Reward Progress Card
-            Card(modifier = Modifier.fillMaxWidth()) {
+            if (adsAllowed) Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(20.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
@@ -100,7 +104,7 @@ fun SubscriptionScreen(
                 }
             }
 
-            Button(
+            if (adsAllowed) Button(
                 onClick = {
                     val activity = context as? Activity
                     if (activity == null) {
@@ -140,7 +144,7 @@ fun SubscriptionScreen(
                 }
             }
 
-            adMessage?.let {
+            if (adsAllowed) adMessage?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -148,7 +152,7 @@ fun SubscriptionScreen(
                 )
             }
 
-            if (adState is SubscriptionViewModel.AdState.Error) {
+            if (adsAllowed && adState is SubscriptionViewModel.AdState.Error) {
                 Text(
                     text = (adState as SubscriptionViewModel.AdState.Error).error.userMessage,
                     color = MaterialTheme.colorScheme.error,
@@ -160,7 +164,11 @@ fun SubscriptionScreen(
 
             // Info
             Text(
-                text = "Watch 20 rewarded ads to earn 1 day of premium access. Server verifies all rewards.",
+                text = if (adsAllowed) {
+                    "Watch 20 rewarded ads to earn 1 day of premium access. Server verifies all rewards."
+                } else {
+                    "Your account is ad-free. No ads are shown in this app."
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

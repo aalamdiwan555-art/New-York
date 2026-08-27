@@ -154,7 +154,7 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:realtime-kt:3.0.0")
 
     // Ktor
-    implementation("io.ktor:ktor-client-android:3.0.0-rc-1")
+    implementation("io.ktor:ktor-client-android:3.0.0")
     implementation("io.ktor:ktor-client-content-negotiation:3.0.0-rc-1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.0-rc-1")
 

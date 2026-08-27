@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
+import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
@@ -65,6 +66,13 @@ class OverlayService : Service() {
     }
 
     private fun showMatchOverlay(price: String, phrase: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+            !Settings.canDrawOverlays(this)
+        ) {
+            stopSelf()
+            return
+        }
+
         removeOverlay()
 
         val params = WindowManager.LayoutParams(
@@ -138,10 +146,7 @@ class OverlayService : Service() {
         }
 
         fun remove(context: Context) {
-            val intent = Intent(context, OverlayService::class.java).apply {
-                action = ACTION_REMOVE
-            }
-            ContextCompat.startForegroundService(context, intent)
+            context.stopService(Intent(context, OverlayService::class.java))
         }
     }
 }

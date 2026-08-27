@@ -70,3 +70,4 @@ local.properties
 /app/debug/
 secrets.properties
 supabase.properties
+.env

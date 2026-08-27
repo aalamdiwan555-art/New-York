@@ -2,7 +2,7 @@ package com.example.ridepricematcher.data.repository
 
 import com.example.ridepricematcher.data.remote.SupabaseClientProvider
 import com.example.ridepricematcher.ads.AdPolicy
-import com.example.ridepricematcher.RidePriceMatcherApplication
+import com.example.ridepricematcher.AppModule
 import com.example.ridepricematcher.domain.model.AppError
 import com.example.ridepricematcher.domain.model.UserProfile
 import io.github.jan.supabase.auth.providers.builtin.Email

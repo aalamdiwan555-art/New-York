@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 class SubscriptionViewModel : ViewModel() {
 
     private val authRepo = AppModule.authRepository
-    private val entitlementRepo = RidePriceMatcherApplication.instance.entitlementRepository
+    private val entitlementRepo = AppModule.entitlementRepository
 
     private val _entitlement = MutableStateFlow<Entitlement?>(null)
     val entitlement: StateFlow<Entitlement?> = _entitlement.asStateFlow()

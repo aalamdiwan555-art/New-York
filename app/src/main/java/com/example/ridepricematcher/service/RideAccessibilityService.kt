@@ -17,7 +17,6 @@ class RideAccessibilityService : AccessibilityService() {
 
     private val allowedPackages = setOf(
         "com.ubercab.driver",
-        "com.rapido.rider",
         "com.rapido.passenger",
         "com.ubercab",
         "com.olacabs.customer",
@@ -32,7 +31,6 @@ class RideAccessibilityService : AccessibilityService() {
         "com.jumbotrons.blinkit",
         "com.urbanclap.urbanclap",
         "com.zypp.customer",
-        "com.ola.android",
         "com.didi.global.passenger",
         "in.merucab",
         "com.ridewithvia.driver",

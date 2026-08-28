@@ -48,9 +48,8 @@ class SubscriptionViewModel : ViewModel() {
             _adState.value = AdState.Processing
             entitlementRepo.recordAdReward(userId, provider, rewardId)
                 .onSuccess {
-                    _adProgress.value = (_adProgress.value + 1) % 20
                     _adState.value = AdState.Rewarded
-                    loadData() // Refresh entitlement
+                    loadData() // Refresh entitlement & progress from server
                 }
                 .onFailure {
                     _adState.value = AdState.Error(it as? AppError ?: AppError.Unknown("Reward failed", ""))

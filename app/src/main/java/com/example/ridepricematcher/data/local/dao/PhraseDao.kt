@@ -9,6 +9,9 @@ interface PhraseDao {
     @Query("SELECT * FROM phrases WHERE languageId = :languageId AND enabled = 1")
     fun getPhrasesForLanguage(languageId: String): Flow<List<CachedPhraseEntity>>
 
+    @Query("SELECT * FROM phrases WHERE enabled = 1")
+    suspend fun getEnabledPhrasesOnce(): List<CachedPhraseEntity>
+
     @Query("SELECT * FROM phrases WHERE type = :type AND enabled = 1")
     fun getPhrasesByType(type: String): Flow<List<CachedPhraseEntity>>
 

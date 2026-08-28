@@ -21,15 +21,8 @@ class RideAccessibilityService : AccessibilityService() {
         "com.ubercab",
         "com.olacabs.customer",
         "com.olacabs.driver",
-        "com.dunzo.user",
-        "com.dunzo.delivery",
         "com.meru.meru",
         "com.meru.merudriver",
-        "in.swiggy.deliveryapp",
-        "com.zomato.delivery",
-        "com.bigbasket.bigbasket",
-        "com.jumbotrons.blinkit",
-        "com.urbanclap.urbanclap",
         "com.zypp.customer",
         "com.didi.global.passenger",
         "in.merucab",
@@ -110,7 +103,7 @@ class RideAccessibilityService : AccessibilityService() {
         )
         if (!rule.isValid()) return
 
-        val languages = getDefaultLanguages().filter {
+        val languages = AppModule.languageRepository.getEnabledLanguagesWithPhrases().filter {
             preferences.selectedLanguages.isEmpty() ||
                 it.locale in preferences.selectedLanguages
         }

@@ -10,6 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 class EntitlementRepository(
     private val entitlementDao: EntitlementDao
@@ -52,6 +54,16 @@ class EntitlementRepository(
                         put("reward_value", 1)
                     }
                 )
+                
+                // Get the updated reward count
+                val countResult = getAdRewardCount(userId)
+                if (countResult.isSuccess) {
+                    val count = countResult.getOrThrow()
+                    if (count > 0 && count % 20 == 0) {
+                        grantPremium(userId, 1)
+                    }
+                }
+                
                 Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(AppError.Server("Failed to record reward", e.message ?: ""))
@@ -60,14 +72,62 @@ class EntitlementRepository(
 
     suspend fun getAdRewardCount(userId: String): Result<Int> = withContext(Dispatchers.IO) {
         try {
+            val oneDayAgo = Instant.now().minus(24, ChronoUnit.HOURS).toString()
             val result = postgrest.from("rewarded_ad_rewards")
                 .select {
-                    filter { eq("user_id", userId) }
+                    filter {
+                        eq("user_id", userId)
+                        gte("created_at", oneDayAgo)
+                    }
                 }
                 .decodeList<RewardDto>()
             Result.success(result.size)
         } catch (e: Exception) {
             Result.failure(AppError.Server("Failed to load reward count", e.message ?: ""))
+        }
+    }
+
+    suspend fun grantPremium(userId: String, days: Int): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val currentDto = postgrest.from("entitlements")
+                .select { filter { eq("user_id", userId) } }
+                .decodeSingleOrNull<EntitlementDto>()
+            
+            val now = Instant.now()
+            val currentExpires = currentDto?.subscription_expires_at?.let {
+                try { Instant.parse(it) } catch (_: Exception) { null }
+            }
+            
+            val baseTime = if (currentExpires != null && currentExpires.isAfter(now)) {
+                currentExpires
+            } else {
+                now
+            }
+            val newExpires = baseTime.plus(days.toLong(), ChronoUnit.DAYS).toString()
+            
+            postgrest.from("entitlements").upsert(
+                buildJsonObject {
+                    put("user_id", userId)
+                    put("type", "PREMIUM")
+                    put("ad_free", true)
+                    put("subscription_expires_at", newExpires)
+                }
+            )
+            
+            // Update cache
+            cacheEntitlement(
+                Entitlement(
+                    id = currentDto?.id ?: "",
+                    userId = userId,
+                    type = EntitlementType.PREMIUM,
+                    adFree = true,
+                    subscriptionExpiresAt = newExpires
+                )
+            )
+            
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(AppError.Server("Failed to grant premium", e.message ?: ""))
         }
     }
 

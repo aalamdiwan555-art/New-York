@@ -251,7 +251,7 @@ fun MonitoringStatusCard(
         Column(modifier = Modifier.padding(20.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = if (enabled) Icons.Default.Radar else Icons.Default.Radar,
+                    imageVector = if (enabled) Icons.Default.Radar else Icons.Default.PauseCircle,
                     contentDescription = null,
                     tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                 )

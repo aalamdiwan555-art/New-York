@@ -32,12 +32,10 @@ class TextNormalizer {
 
     private fun String.ocrNormalize(): String {
         return this
-            .replace(Regex("""0(?=\d{2,})"""), "O") // common OCR error: 0 vs O in context
-            .replace(Regex("""\\|"""), "I") // pipe to I
     }
 
     fun normalizeForMatching(text: String, language: String): String {
-        var normalized = normalize(text).lowercase()
+        var normalized = normalize(text)
 
         // Script-specific normalizations
         when (language) {
@@ -49,7 +47,7 @@ class TextNormalizer {
             "ml" -> normalized = normalizeMalayalam(normalized)
         }
 
-        return normalized
+        return normalized.lowercase()
     }
 
     private fun normalizeDevanagari(text: String): String {

@@ -25,7 +25,8 @@ fun OnboardingScreen(
     onComplete: () -> Unit
 ) {
     val completed by viewModel.completed.collectAsStateWithLifecycle()
-    val pagerState = rememberPagerState(pageCount = { 8 })
+    val totalPages by viewModel.totalPages.collectAsStateWithLifecycle()
+    val pagerState = rememberPagerState(pageCount = { totalPages })
 
     LaunchedEffect(completed) {
         if (completed) onComplete()
@@ -53,13 +54,13 @@ fun OnboardingScreen(
         ) {
             TextButton(
                 onClick = { viewModel.skipToEnd() },
-                enabled = pagerState.currentPage < 7
+                enabled = pagerState.currentPage < totalPages - 1
             ) {
                 Text("Skip")
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                repeat(8) { index ->
+                repeat(totalPages) { index ->
                     val selected = pagerState.currentPage == index
                     Box(
                         modifier = Modifier
@@ -80,7 +81,7 @@ fun OnboardingScreen(
             }
 
             Button(onClick = { viewModel.nextPage() }) {
-                Text(if (pagerState.currentPage == 7) "Get Started" else "Next")
+                Text(if (pagerState.currentPage == totalPages - 1) "Get Started" else "Next")
             }
         }
     }

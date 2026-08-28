@@ -37,6 +37,16 @@ jobs:
         run: |
           echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}" > local.properties
 
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Run Lint
+        run: ./gradlew lint --no-daemon --stacktrace
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
         env:

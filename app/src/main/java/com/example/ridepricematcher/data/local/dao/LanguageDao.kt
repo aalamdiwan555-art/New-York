@@ -9,6 +9,9 @@ interface LanguageDao {
     @Query("SELECT * FROM languages WHERE enabled = 1")
     fun getEnabledLanguages(): Flow<List<CachedLanguageEntity>>
 
+    @Query("SELECT * FROM languages WHERE enabled = 1")
+    suspend fun getEnabledLanguagesOnce(): List<CachedLanguageEntity>
+
     @Query("SELECT * FROM languages")
     fun getAllLanguages(): Flow<List<CachedLanguageEntity>>
 

@@ -37,7 +37,7 @@
         <!-- Accessibility Service for legitimate visible-text observation -->
         <service
             android:name=".service.RideAccessibilityService"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/accessibility_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>

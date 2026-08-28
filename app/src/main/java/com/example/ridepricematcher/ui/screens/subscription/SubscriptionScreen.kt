@@ -165,7 +165,7 @@ fun SubscriptionScreen(
             // Info
             Text(
                 text = if (adsAllowed) {
-                    "Watch 20 rewarded ads to earn 1 day of premium access. Server verifies all rewards."
+                    "Watch 20 rewarded ads to earn 1 day of premium access. Progress is synchronized with your profile."
                 } else {
                     "Your account is ad-free. No ads are shown in this app."
                 },

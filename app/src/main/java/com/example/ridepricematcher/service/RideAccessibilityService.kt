@@ -16,8 +16,22 @@ import kotlinx.coroutines.*
 class RideAccessibilityService : AccessibilityService() {
 
     private val allowedPackages = setOf(
+        "com.ubercab.driver",
         "com.rapido.rider",
+        "com.rapido.passenger",
         "com.ubercab",
+        "com.olacabs.customer",
+        "com.olacabs.driver",
+        "com.dunzo.user",
+        "com.dunzo.delivery",
+        "com.meru.meru",
+        "com.meru.merudriver",
+        "in.swiggy.deliveryapp",
+        "com.zomato.delivery",
+        "com.bigbasket.bigbasket",
+        "com.jumbotrons.blinkit",
+        "com.urbanclap.urbanclap",
+        "com.zypp.customer",
         "com.ola.android",
         "com.didi.global.passenger",
         "in.merucab",

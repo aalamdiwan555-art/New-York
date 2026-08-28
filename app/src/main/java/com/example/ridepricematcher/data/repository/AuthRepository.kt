@@ -1,10 +1,11 @@
 package com.example.ridepricematcher.data.repository
 
+import android.content.Context
 import com.example.ridepricematcher.data.remote.SupabaseClientProvider
 import com.example.ridepricematcher.ads.AdPolicy
-import com.example.ridepricematcher.AppModule
 import com.example.ridepricematcher.domain.model.AppError
 import com.example.ridepricematcher.domain.model.UserProfile
+import com.example.ridepricematcher.domain.model.UserRoleResolver
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.postgrest.query.Columns
@@ -13,7 +14,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-class AuthRepository {
+class AuthRepository(
+    private val appContext: Context
+) {
 
     private val auth = SupabaseClientProvider.auth
     private val postgrest = SupabaseClientProvider.postgrest
@@ -58,7 +61,7 @@ class AuthRepository {
                     return@withContext Result.failure(AppError.Blocked())
                 }
                 val effectiveProfile = profile ?: mapToProfile(user, "")
-                AdPolicy.setUser(AppModule.applicationContext, effectiveProfile)
+                AdPolicy.setUser(appContext, effectiveProfile)
                 Result.success(effectiveProfile)
             } catch (e: Exception) {
                 Result.failure(mapAuthError(e))
@@ -78,7 +81,7 @@ class AuthRepository {
     suspend fun signOut(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             auth.signOut()
-            AdPolicy.clear(AppModule.applicationContext)
+            AdPolicy.clear(appContext)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(AppError.Auth("Logout failed", e.message ?: "Unknown error"))
@@ -95,7 +98,7 @@ class AuthRepository {
         val profile = fetchProfile(user.id).getOrElse { error ->
             return@withContext Result.failure(error)
         } ?: mapToProfile(user, "")
-        AdPolicy.setUser(AppModule.applicationContext, profile)
+        AdPolicy.setUser(appContext, profile)
         Result.success(profile)
     }
 
@@ -115,7 +118,7 @@ class AuthRepository {
                     put("id", userId)
                     put("email", email)
                     put("display_name", name)
-                    put("role", if (email.equals(AdPolicy.PRIMARY_ADMIN_EMAIL, ignoreCase = true)) "admin" else "user")
+                    put("role", if (UserRoleResolver.isAdminEmail(email)) "admin" else "user")
                     put("blocked", false)
                 }
             )

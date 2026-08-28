@@ -13,6 +13,7 @@ import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
+import com.example.ridepricematcher.R
 import com.example.ridepricematcher.domain.model.MatchResult
 
 /**
@@ -61,7 +62,7 @@ class OverlayService : Service() {
         return Notification.Builder(this, channelId)
             .setContentTitle("Autopilot")
             .setContentText("Monitoring for price matches")
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(R.drawable.ic_notification)
             .build()
     }
 

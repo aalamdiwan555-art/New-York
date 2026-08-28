@@ -26,13 +26,33 @@ val supabaseAnonKey =
 val escapedSupabaseAnonKey = supabaseAnonKey
     .replace("\\", "\\\\")
     .replace("\"", "\\\"")
+    .replace("$", "\\$")
+
+val supabaseUrl =
+    System.getenv("SUPABASE_URL")
+        ?.takeIf { it.isNotBlank() }
+        ?: localProperties.getProperty("SUPABASE_URL")
+        ?: project.findProperty("SUPABASE_URL")?.toString()
+        ?: "https://rhwpbnzbevufolojjimh.supabase.co"
+
+val adminEmail =
+    System.getenv("ADMIN_EMAIL")
+        ?.takeIf { it.isNotBlank() }
+        ?: localProperties.getProperty("ADMIN_EMAIL")
+        ?: project.findProperty("ADMIN_EMAIL")?.toString()
+        ?: ""
+
+val escapedAdminEmail = adminEmail
+    .replace("\\", "\\\\")
+    .replace("\"", "\\\"")
+    .replace("$", "\\$")
 
 android {
     namespace = "com.example.ridepricematcher"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.autopilot.driver"
+        applicationId = "com.example.ridepricematcher"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -47,7 +67,7 @@ android {
         buildConfigField(
             "String",
             "SUPABASE_URL",
-            "\"https://rhwpbnzbevufolojjimh.supabase.co\""
+            "\"$supabaseUrl\""
         )
 
         buildConfigField(
@@ -60,6 +80,12 @@ android {
             "String",
             "UNITY_GAME_ID",
             "\"6178983\""
+        )
+
+        buildConfigField(
+            "String",
+            "ADMIN_EMAIL",
+            "\"$escapedAdminEmail\""
         )
     }
 
@@ -155,8 +181,8 @@ dependencies {
 
     // Ktor
     implementation("io.ktor:ktor-client-android:3.0.0")
-    implementation("io.ktor:ktor-client-content-negotiation:3.0.0-rc-1")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.0-rc-1")
+    implementation("io.ktor:ktor-client-content-negotiation:3.0.0")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.0")
 
     // Kotlin Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.0")

@@ -6,6 +6,7 @@ import com.example.ridepricematcher.data.local.AppDatabase
 import com.example.ridepricematcher.data.repository.AdminRepository
 import com.example.ridepricematcher.data.repository.AuthRepository
 import com.example.ridepricematcher.data.repository.EntitlementRepository
+import com.example.ridepricematcher.data.repository.FeatureFlagRepository
 import com.example.ridepricematcher.data.repository.LanguageRepository
 import com.example.ridepricematcher.data.repository.UserPreferenceRepository
 
@@ -25,6 +26,8 @@ object AppModule {
         private set
     lateinit var adminRepository: AdminRepository
         private set
+    lateinit var featureFlagRepository: FeatureFlagRepository
+        private set
 
     @Synchronized
     fun init(context: Context) {
@@ -35,10 +38,11 @@ object AppModule {
             AppDatabase::class.java,
             "autopilot.db"
         ).build()
-        authRepository = AuthRepository()
+        authRepository = AuthRepository(applicationContext)
         entitlementRepository = EntitlementRepository(database.entitlementDao())
         languageRepository = LanguageRepository(database.languageDao(), database.phraseDao())
         userPreferenceRepository = UserPreferenceRepository(database.userPreferenceDao())
         adminRepository = AdminRepository()
+        featureFlagRepository = FeatureFlagRepository()
     }
 }

@@ -11,8 +11,6 @@ import com.example.ridepricematcher.domain.model.UserProfile
  * cached for services that run outside an Activity, such as the overlay.
  */
 object AdPolicy {
-    const val PRIMARY_ADMIN_EMAIL = "aalamdiwan555@gmail.com"
-
     private const val PREFS = "ad_policy"
     private const val ACTIVE_USER = "active_user"
     private const val ADMIN = "admin"

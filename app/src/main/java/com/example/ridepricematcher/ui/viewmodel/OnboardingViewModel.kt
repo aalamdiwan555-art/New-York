@@ -12,7 +12,7 @@ class OnboardingViewModel : ViewModel() {
     private val _currentPage = MutableStateFlow(0)
     val currentPage: StateFlow<Int> = _currentPage.asStateFlow()
 
-    private val _totalPages = MutableStateFlow(9)
+    private val _totalPages = MutableStateFlow(8)
     val totalPages: StateFlow<Int> = _totalPages.asStateFlow()
 
     private val _completed = MutableStateFlow(false)

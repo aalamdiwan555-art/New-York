@@ -4,6 +4,7 @@
     android:accessibilityFeedbackType="feedbackGeneric"
     android:accessibilityFlags="flagDefault|flagIncludeNotImportantViews|flagReportViewIds"
     android:canRetrieveWindowContent="true"
+    android:packageNames="com.ubercab,com.ubercab.driver,com.olacabs.customer,com.olacabs.driver,com.dunzo.user,com.dunzo.delivery,com.rapido.passenger,com.rapido.rider,com.meru.meru,com.meru.merudriver,in.swiggy.deliveryapp,com.zomato.delivery,com.bigbasket.bigbasket,com.jumbotrons.blinkit,com.urbanclap.urbanclap,com.zypp.customer"
     android:description="@string/accessibility_service_description"
     android:notificationTimeout="100"
     android:settingsActivity="com.example.ridepricematcher.ui.MainActivity" />

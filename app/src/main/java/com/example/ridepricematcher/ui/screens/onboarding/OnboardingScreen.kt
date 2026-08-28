@@ -26,14 +26,15 @@ fun OnboardingScreen(
 ) {
     val completed by viewModel.completed.collectAsStateWithLifecycle()
     val totalPages by viewModel.totalPages.collectAsStateWithLifecycle()
+    val currentPage by viewModel.currentPage.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState(pageCount = { totalPages })
 
     LaunchedEffect(completed) {
         if (completed) onComplete()
     }
 
-    LaunchedEffect(viewModel.currentPage.value) {
-        pagerState.animateScrollToPage(viewModel.currentPage.value)
+    LaunchedEffect(currentPage) {
+        pagerState.animateScrollToPage(currentPage)
     }
 
     Column(modifier = Modifier.fillMaxSize()) {

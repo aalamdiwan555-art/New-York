@@ -24,10 +24,10 @@ class AcceptancePhraseMatcher(
     data class Match(val phrase: String, val language: String, val confidence: Float)
 
     fun match(text: String, languages: List<LanguageConfig>): Match? {
-        val normalizedText = normalizer.normalize(text)
         var bestMatch: Match? = null
         var bestConfidence = 0f
         for (lang in languages.filter { it.enabled }) {
+            val normalizedText = normalizer.normalizeForMatching(text, lang.locale)
             val threshold = config.thresholdFor(lang.locale)
             for (phrase in lang.acceptancePhrases) {
                 val normalizedPhrase = normalizer.normalizeForMatching(phrase, lang.locale)

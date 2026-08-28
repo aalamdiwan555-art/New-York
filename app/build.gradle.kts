@@ -21,7 +21,7 @@ val supabaseAnonKey =
         ?.takeIf { it.isNotBlank() }
         ?: localProperties.getProperty("SUPABASE_ANON_KEY")
         ?: project.findProperty("SUPABASE_ANON_KEY")?.toString()
-        ?: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJod3BibnpiZXZ1Zm9sb2pqaW1oIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NzA1ODQ5MCwiZXhwIjoyMTAyNjM0NDkwfQ.qwJIMgdrbi8bb7jfqcedQENrAG-X2tu-RTLNgQj0kdA"
+        ?: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJod3BibnpiZXZ1Zm9sb2pqaW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNTg0OTAsImV4cCI6MjEwMjYzNDQ5MH0.8CMLz2ClIpagcFSnHsvDUwIsEiN8VkY8JqYD9ttZSnI"
 
 val escapedSupabaseAnonKey = supabaseAnonKey
     .replace("\\", "\\\\")
